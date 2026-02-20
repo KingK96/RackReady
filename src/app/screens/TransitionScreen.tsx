@@ -1,0 +1,158 @@
+import { useNavigate } from 'react-router';
+import { TransitionBarbell } from '../components/TransitionBarbell';
+import { ChevronLeft, Menu, ArrowRight, Plus, Check } from 'lucide-react';
+
+const PLATE_COLORS = {
+  45: '#E74C3C',
+  25: '#3498DB',
+  10: '#F1C40F',
+  5: '#2ECC71',
+  2.5: '#95A5A6',
+};
+
+const PLATE_WIDTHS = {
+  45: 50,
+  25: 42,
+  10: 34,
+  5: 28,
+  2.5: 24,
+};
+
+interface LoadedPlate {
+  weight: number;
+  color: string;
+  width: number;
+  isNew?: boolean;
+}
+
+export function TransitionScreen() {
+  const navigate = useNavigate();
+  const currentWeight = 185;
+  const targetWeight = 225;
+  const barWeight = 45;
+
+  const currentPlates: LoadedPlate[] = [
+    { weight: 45, color: PLATE_COLORS[45], width: PLATE_WIDTHS[45] },
+    { weight: 25, color: PLATE_COLORS[25], width: PLATE_WIDTHS[25] },
+  ];
+
+  const targetPlates: LoadedPlate[] = [
+    { weight: 45, color: PLATE_COLORS[45], width: PLATE_WIDTHS[45] },
+    { weight: 25, color: PLATE_COLORS[25], width: PLATE_WIDTHS[25] },
+    { weight: 25, color: PLATE_COLORS[25], width: PLATE_WIDTHS[25], isNew: true },
+  ];
+
+  const difference = targetWeight - currentWeight;
+  const platesPerSide = difference / 2;
+
+  return (
+    <div className="min-h-screen bg-zinc-950 text-white">
+      <div className="max-w-[430px] mx-auto min-h-screen bg-zinc-900 flex flex-col">
+        <header className="flex items-center justify-between px-5 py-4 border-b border-zinc-800">
+          <button 
+            onClick={() => navigate('/load')}
+            className="p-2 -ml-2 hover:bg-zinc-800 rounded-lg transition-colors"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <div className="flex-1 text-center">
+            <h1 className="text-lg font-semibold">Squat</h1>
+            <p className="text-xs text-zinc-400">Set 2 of 4</p>
+          </div>
+          <button className="p-2 -mr-2 hover:bg-zinc-800 rounded-lg transition-colors">
+            <Menu className="w-6 h-6" />
+          </button>
+        </header>
+
+        <main className="flex-1 overflow-y-auto px-5 py-6 space-y-6">
+          <div className="bg-gradient-to-br from-zinc-800 to-zinc-800/50 rounded-2xl p-6 border border-zinc-700">
+            <div className="flex items-center justify-between">
+              <div className="text-center flex-1">
+                <p className="text-xs uppercase tracking-wider text-zinc-400 mb-2">Current</p>
+                <p className="text-3xl font-bold">{currentWeight}</p>
+                <p className="text-xs text-zinc-500 mt-1">lb</p>
+              </div>
+              
+              <div className="flex items-center justify-center px-4">
+                <ArrowRight className="w-6 h-6 text-blue-500" />
+              </div>
+
+              <div className="text-center flex-1">
+                <p className="text-xs uppercase tracking-wider text-zinc-400 mb-2">Target</p>
+                <p className="text-3xl font-bold text-blue-400">{targetWeight}</p>
+                <p className="text-xs text-zinc-500 mt-1">lb</p>
+              </div>
+            </div>
+
+            <div className="mt-6 pt-6 border-t border-zinc-700">
+              <div className="flex items-center justify-center gap-2 text-blue-400">
+                <Plus className="w-5 h-5" />
+                <span className="text-lg font-semibold">{difference} lb total</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-blue-600/10 border border-blue-600/30 rounded-2xl p-5">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Plus className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm text-zinc-400 mb-1">Next Step</p>
+                <p className="text-lg font-semibold">Add 25 lb plate to each side</p>
+                <p className="text-sm text-zinc-400 mt-2">+{platesPerSide} lb per side</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h2 className="text-sm uppercase tracking-wider text-zinc-400">Visual Guide</h2>
+            
+            <div className="bg-zinc-800/50 rounded-2xl p-5 border border-zinc-700">
+              <TransitionBarbell 
+                loadedPlates={currentPlates}
+                label="Current"
+                weight={currentWeight}
+                compact
+              />
+            </div>
+
+            <div className="flex justify-center">
+              <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
+                <ArrowRight className="w-5 h-5 rotate-90" />
+              </div>
+            </div>
+
+            <div className="bg-zinc-800/50 rounded-2xl p-5 border-2 border-blue-600/50">
+              <TransitionBarbell 
+                loadedPlates={targetPlates}
+                label="After Change"
+                weight={targetWeight}
+                compact
+              />
+              <div className="mt-4 pt-4 border-t border-zinc-700">
+                <div className="flex items-center gap-2 text-sm text-zinc-400">
+                  <div className="w-3 h-3 rounded-sm bg-blue-500 ring-2 ring-blue-500/50"></div>
+                  <span>New plates highlighted</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <div className="p-5 border-t border-zinc-800 bg-zinc-900 space-y-3">
+          <button 
+            onClick={() => navigate('/')}
+            className="w-full py-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-98 transition-all text-lg font-semibold shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2"
+          >
+            <Check className="w-5 h-5" />
+            Apply Change
+          </button>
+          <button className="w-full py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 transition-colors text-sm">
+            Skip to Next Set
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
