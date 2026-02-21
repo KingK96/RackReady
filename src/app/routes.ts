@@ -7,6 +7,10 @@ import { TransitionScreen } from './screens/TransitionScreen';
 
 export const router = createBrowserRouter([
   {
+    path: '/',
+    Component: LoadScreen,
+  },
+  {
     path: '/load',
     Component: LoadScreen,
   },

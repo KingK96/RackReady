@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { TransitionBarbell } from '../components/TransitionBarbell';
 import { ChevronLeft, Menu, ArrowRight, Plus, Check } from 'lucide-react';
 import { getRackState, setRackState } from "../utils/rackState";
