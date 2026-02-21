@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { TransitionBarbell } from '../components/TransitionBarbell';
 import { ChevronLeft, Menu, ArrowRight, Plus, Check } from 'lucide-react';
@@ -30,9 +31,12 @@ interface LoadedPlate {
 export function TransitionScreen() {
   const navigate = useNavigate();
   const state = getRackState();
+  const workout = state.workout ?? "Squat";
 const barWeight = state.barWeight;
 const currentWeight = state.currentTotal;
 const targetWeight = state.targetTotal;
+const [setNumber, setSetNumber] = useState<number>(state.setNumber ?? 1);
+const [setTotal, setSetTotal] = useState<number>(state.setTotal ?? 4);
 
 const currentPerSide = state.currentPerSide ?? [];
 const targetCalc = calculatePerSide({
@@ -68,6 +72,13 @@ const handleApply = () => {
   const difference = targetWeight - currentWeight;
   const platesPerSide = difference / 2;
 
+  const nextStep =
+  transition.remove.length > 0
+    ? { action: "Remove", denom: transition.remove[0].denom, count: transition.remove[0].count }
+    : transition.add.length > 0
+    ? { action: "Add", denom: transition.add[0].denom, count: transition.add[0].count }
+    : null;
+
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
       <div className="max-w-[430px] mx-auto min-h-screen bg-zinc-900 flex flex-col">
@@ -79,9 +90,51 @@ const handleApply = () => {
             <ChevronLeft className="w-6 h-6" />
           </button>
           <div className="flex-1 text-center">
-            <h1 className="text-lg font-semibold">Squat</h1>
-            <p className="text-xs text-zinc-400">Set 2 of 4</p>
+            <h1 className="text-lg font-semibold">{workout}</h1>
+            <p className="text-xs text-zinc-400">
+              Set {setNumber} of {setTotal}
+            </p>
           </div>
+          <div className="mt-2 flex items-center justify-center gap-2">
+  <button
+    className="px-3 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-sm"
+    onClick={() => {
+      const next = Math.max(1, setNumber - 1);
+      setSetNumber(next);
+      setRackState({ setNumber: next, setTotal });
+    }}
+  >
+    Prev
+  </button>
+
+  <button
+    className="px-3 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-sm"
+    onClick={() => {
+      const next = Math.min(setTotal, setNumber + 1);
+      setSetNumber(next);
+      setRackState({ setNumber: next, setTotal });
+    }}
+  >
+    Next
+  </button>
+
+  <div className="ml-2 flex items-center gap-2">
+    <span className="text-xs text-zinc-400">Total</span>
+    <input
+      className="w-16 bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-2 text-white text-sm"
+      value={setTotal}
+      onChange={(e) => {
+        const v = Math.max(1, Number(e.target.value || 1));
+        setSetTotal(v);
+        // keep setNumber valid
+        const clamped = Math.min(v, setNumber);
+        if (clamped !== setNumber) setSetNumber(clamped);
+        setRackState({ setNumber: clamped, setTotal: v });
+      }}
+      inputMode="numeric"
+    />
+  </div>
+</div>
           <button className="p-2 -mr-2 hover:bg-zinc-800 rounded-lg transition-colors">
             <Menu className="w-6 h-6" />
           </button>
@@ -121,9 +174,11 @@ const handleApply = () => {
                 <Plus className="w-5 h-5" />
               </div>
               <div className="flex-1">
-                <p className="text-sm text-zinc-400 mb-1">Next Step</p>
-                <p className="text-lg font-semibold">Add 25 lb plate to each side</p>
-                <p className="text-sm text-zinc-400 mt-2">+{platesPerSide} lb per side</p>
+                <p className="text-lg font-semibold">
+                  {nextStep
+                    ? `${nextStep.action} ${nextStep.count} × ${nextStep.denom} lb plate${nextStep.count > 1 ? "s" : ""} to each side`
+                    : "No plate change needed"}
+                </p>
               </div>
             </div>
           </div>
@@ -146,7 +201,7 @@ const handleApply = () => {
               <TransitionBarbell 
                 loadedPlates={currentPlates}
                 label="Current"
-                weight={currentWeight}
+                weight={targetCalc.achievableTotal}
                 compact
               />
             </div>
@@ -176,12 +231,12 @@ const handleApply = () => {
 
         <div className="p-5 border-t border-zinc-800 bg-zinc-900 space-y-3">
           <button 
-            onClick={() => navigate('/')}
-            className="w-full py-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-98 transition-all text-lg font-semibold shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2"
-          >
-            <Check className="w-5 h-5" />
-            Apply Change
-          </button>
+              onClick={handleApply}
+              className="w-full py-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-98 transition-all text-lg font-semibold shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2"
+            >
+              <Check className="w-5 h-5" />
+              Apply Change
+            </button>
           <button className="w-full py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 transition-colors text-sm">
             Skip to Next Set
           </button>

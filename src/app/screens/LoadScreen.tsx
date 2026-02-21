@@ -36,6 +36,13 @@ export function LoadScreen() {
     { weight: 45, color: PLATE_COLORS[45], width: PLATE_WIDTHS[45] },
   ]);
 
+  const WORKOUTS = ["Squat", "Bench Press", "Deadlift", "Overhead Press", "Barbell Row"] as const;
+type Workout = (typeof WORKOUTS)[number];
+
+const [workout, setWorkout] = useState<Workout>("Squat");
+
+
+
   const [availablePlates, setAvailablePlates] = useState<PlateType[]>([
     { weight: 45, color: PLATE_COLORS[45], count: 3, width: PLATE_WIDTHS[45] },
     { weight: 25, color: PLATE_COLORS[25], count: 4, width: PLATE_WIDTHS[25] },
@@ -65,6 +72,7 @@ export function LoadScreen() {
     targetTotal: targetWeight,
     currentPerSide,
     targetPerSide: calc.perSide,
+    workout
   });
 
   navigate("/transition");
@@ -112,7 +120,19 @@ export function LoadScreen() {
       <ChevronLeft className="w-6 h-6" />
     </button>
 
-    <h1 className="text-lg font-semibold">Squat</h1>
+    <div className="flex flex-col items-center">
+  <select
+    value={workout}
+    onChange={(e) => setWorkout(e.target.value as Workout)}
+    className="bg-transparent text-white text-lg font-semibold text-center outline-none"
+  >
+    {WORKOUTS.map((w) => (
+      <option key={w} value={w} className="bg-zinc-900">
+        {w}
+      </option>
+    ))}
+  </select>
+</div>
 
     <button
       className="p-2 -mr-2 hover:bg-zinc-800 rounded-lg transition-colors"

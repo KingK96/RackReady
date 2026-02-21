@@ -2,6 +2,13 @@ export type Unit = "lb";
 
 export type PlateInventory = Record<number, number>; // denom -> total count (both sides combined)
 
+export type Workout =
+  | "Squat"
+  | "Bench Press"
+  | "Deadlift"
+  | "Overhead Press"
+  | "Barbell Row";
+
 export type RackReadyState = {
   unit: Unit;
   barWeight: number;
@@ -10,6 +17,9 @@ export type RackReadyState = {
   inventory: PlateInventory;
   currentPerSide: number[];
   targetPerSide: number[];
+  workout: Workout;
+  setNumber: number;
+  setTotal: number;
 };
 
 const KEY = "rackready:v1";
@@ -22,6 +32,9 @@ const defaultState: RackReadyState = {
   inventory: { 45: 8, 25: 4, 10: 4, 5: 4, 2.5: 4 },
   currentPerSide: [45, 25],
   targetPerSide: [45, 45],
+  workout: "Squat",
+  setNumber: 1,
+  setTotal: 4,
 };
 
 export function getRackState(): RackReadyState {
