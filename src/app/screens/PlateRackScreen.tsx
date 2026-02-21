@@ -27,12 +27,13 @@ interface LoadedPlate {
   color: string;
   width: number;
 }
-const state = getRackState();
-const [targetWeight, setTargetWeight] = React.useState<number>(state.targetTotal ?? 225);
+
 
 export function PlateRackScreen() {
   const navigate = useNavigate();
   const barWeight = 45;
+  const state = getRackState();
+  const [targetWeight, setTargetWeight] = React.useState<number>(state.targetTotal ?? 225);
   
   const [plateInventory, setPlateInventory] = React.useState<PlateInfo[]>([
     { weight: 45, color: PLATE_COLORS[45], count: 4, pairsLoaded: 1 },
