@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router';
 import { BarbellDisplay } from '../components/BarbellDisplay';
 import { PlateRack, PlateType } from '../components/PlateRack';
 import { ChevronLeft, Menu, ArrowRight } from 'lucide-react';
+import { getRackState, setRackState } from "../utils/rackState";
+import { calculatePerSide } from "../utils/plateMath";
 
 const PLATE_COLORS = {
   45: '#E74C3C',
@@ -28,7 +30,7 @@ interface LoadedPlate {
 
 export function LoadScreen() {
   const navigate = useNavigate();
-  const [targetWeight] = useState(225);
+  const [targetWeight, setTargetWeight] = useState(225);
   const [loadedPlates, setLoadedPlates] = useState<LoadedPlate[]>([
     { weight: 45, color: PLATE_COLORS[45], width: PLATE_WIDTHS[45] },
     { weight: 45, color: PLATE_COLORS[45], width: PLATE_WIDTHS[45] },
@@ -44,6 +46,29 @@ export function LoadScreen() {
 
   const barWeight = 45;
   const currentWeight = barWeight + (loadedPlates.reduce((sum, plate) => sum + plate.weight, 0) * 2);
+
+  const handleGoToTransition = () => {
+  const state = getRackState();
+
+  // current per side from loadedPlates
+  const currentPerSide = loadedPlates.map((p) => p.weight);
+
+  const calc = calculatePerSide({
+    barWeight,
+    targetTotal: targetWeight,
+    inventory: state.inventory,
+  });
+
+  setRackState({
+    barWeight,
+    currentTotal: currentWeight,
+    targetTotal: targetWeight,
+    currentPerSide,
+    targetPerSide: calc.perSide,
+  });
+
+  navigate("/transition");
+};
 
   const handlePlateSelect = (plate: PlateType) => {
     if (plate.count > 0) {
@@ -83,6 +108,31 @@ export function LoadScreen() {
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
+                <div className="px-5 pt-4">
+        <div className="text-xs text-zinc-400 mb-1">Target</div>
+        <div className="flex items-center gap-2">
+          <input
+            className="w-28 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white"
+            value={targetWeight}
+            onChange={(e) => setTargetWeight(Number(e.target.value || 0))}
+            inputMode="numeric"
+          />
+          <span className="text-zinc-400">lb</span>
+          <button
+            className="ml-auto text-sm px-3 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700"
+            onClick={() => setTargetWeight((w) => w + 10)}
+          >
+            +10
+          </button>
+        </div>
+      </div>
+
+      <button
+  onClick={handleGoToTransition}
+  className="mx-5 mb-5 mt-4 bg-white text-zinc-900 font-medium py-3 rounded-xl flex items-center justify-center gap-2"
+>
+  Transition <ArrowRight size={18} />
+</button>
           <div className="flex-1 text-center">
             <h1 className="text-lg font-semibold">Squat</h1>
           </div>

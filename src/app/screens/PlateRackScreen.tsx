@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router';
 import { PlateGrid, PlateInfo } from '../components/PlateGrid';
 import { CompactBarbell } from '../components/CompactBarbell';
 import { ChevronLeft, Menu, Sparkles, Target } from 'lucide-react';
+import { getRackState, setRackState } from "../utils/rackState";
+import { calculatePerSide } from "../utils/plateMath";
 
 const PLATE_COLORS = {
   45: '#E74C3C',
@@ -25,6 +27,8 @@ interface LoadedPlate {
   color: string;
   width: number;
 }
+const state = getRackState();
+const [targetWeight, setTargetWeight] = useState<number>(state.targetTotal ?? 225);
 
 export function PlateRackScreen() {
   const navigate = useNavigate();
@@ -65,6 +69,30 @@ export function PlateRackScreen() {
     }
   });
 
+  const handleSuggestLoad = () => {
+  const inv: Record<number, number> = {};
+  plateInventory.forEach((p) => (inv[p.weight] = p.count));
+
+  const calc = calculatePerSide({
+    barWeight,
+    targetTotal: targetWeight,
+    inventory: inv,
+  });
+
+  // convert perSide array to pairsLoaded counts
+  const counts: Record<number, number> = {};
+  calc.perSide.forEach((w) => (counts[w] = (counts[w] ?? 0) + 1));
+
+  setPlateInventory((prev) =>
+    prev.map((p) => ({ ...p, pairsLoaded: counts[p.weight] ?? 0 }))
+  );
+
+  setRackState({
+    targetTotal: targetWeight,
+    targetPerSide: calc.perSide,
+  });
+};
+
   const totalWeight = barWeight + (loadedPlates.reduce((sum, plate) => sum + plate.weight, 0) * 2);
 
   return (
@@ -87,6 +115,21 @@ export function PlateRackScreen() {
           <p className="text-xs uppercase tracking-wider text-zinc-400 text-center mb-4">Current Load</p>
           <CompactBarbell loadedPlates={loadedPlates} totalWeight={totalWeight} />
         </div>
+
+            <div className="px-5 pt-4 flex gap-2 items-center">
+      <input
+        className="w-28 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white"
+        value={targetWeight}
+        onChange={(e) => setTargetWeight(Number(e.target.value || 0))}
+        inputMode="numeric"
+      />
+      <button
+        onClick={handleSuggestLoad}
+        className="flex-1 bg-white text-zinc-900 font-medium py-2 rounded-lg flex items-center justify-center gap-2"
+      >
+        <Sparkles size={16} /> Suggest Load
+      </button>
+    </div>
 
         <main className="flex-1 overflow-y-auto px-5 py-6">
           <PlateGrid 

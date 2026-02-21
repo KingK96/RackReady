@@ -6,7 +6,7 @@ import { TransitionScreen } from './screens/TransitionScreen';
 export const router = createBrowserRouter([
   {
     path: '/',
-    Component: PlateRackScreen,
+    Component: LoadScreen,
   },
   {
     path: '/load',
@@ -15,5 +15,9 @@ export const router = createBrowserRouter([
   {
     path: '/transition',
     Component: TransitionScreen,
+  },
+  {
+    path: '/rack',
+    Component: PlateRackScreen,
   },
 ]);

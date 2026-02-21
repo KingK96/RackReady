@@ -1,6 +1,8 @@
-import { useNavigate } from 'react-router';
+import { useNavigate } from "react-router";
 import { TransitionBarbell } from '../components/TransitionBarbell';
 import { ChevronLeft, Menu, ArrowRight, Plus, Check } from 'lucide-react';
+import { getRackState, setRackState } from "../utils/rackState";
+import { diffPerSide, calculatePerSide } from "../utils/plateMath";
 
 const PLATE_COLORS = {
   45: '#E74C3C',
@@ -27,21 +29,42 @@ interface LoadedPlate {
 
 export function TransitionScreen() {
   const navigate = useNavigate();
-  const currentWeight = 185;
-  const targetWeight = 225;
-  const barWeight = 45;
+  const state = getRackState();
+const barWeight = state.barWeight;
+const currentWeight = state.currentTotal;
+const targetWeight = state.targetTotal;
 
-  const currentPlates: LoadedPlate[] = [
-    { weight: 45, color: PLATE_COLORS[45], width: PLATE_WIDTHS[45] },
-    { weight: 25, color: PLATE_COLORS[25], width: PLATE_WIDTHS[25] },
-  ];
+const currentPerSide = state.currentPerSide ?? [];
+const targetCalc = calculatePerSide({
+  barWeight,
+  targetTotal: targetWeight,
+  inventory: state.inventory,
+});
+const targetPerSide = targetCalc.perSide;
 
-  const targetPlates: LoadedPlate[] = [
-    { weight: 45, color: PLATE_COLORS[45], width: PLATE_WIDTHS[45] },
-    { weight: 25, color: PLATE_COLORS[25], width: PLATE_WIDTHS[25] },
-    { weight: 25, color: PLATE_COLORS[25], width: PLATE_WIDTHS[25], isNew: true },
-  ];
+const transition = diffPerSide(currentPerSide, targetPerSide);
 
+  const currentPlates: LoadedPlate[] = currentPerSide.map((w) => ({
+  weight: w,
+  color: PLATE_COLORS[w as keyof typeof PLATE_COLORS],
+  width: PLATE_WIDTHS[w as keyof typeof PLATE_WIDTHS],
+}));
+
+const targetPlates: LoadedPlate[] = targetPerSide.map((w, idx) => ({
+  weight: w,
+  color: PLATE_COLORS[w as keyof typeof PLATE_COLORS],
+  width: PLATE_WIDTHS[w as keyof typeof PLATE_WIDTHS],
+  // mark plates that are newly added compared to current
+  isNew: idx >= currentPerSide.length,
+}));
+
+const handleApply = () => {
+  setRackState({
+    currentTotal: targetCalc.achievableTotal,
+    currentPerSide: targetPerSide,
+  });
+  navigate("/load"); // or wherever your next flow is
+};
   const difference = targetWeight - currentWeight;
   const platesPerSide = difference / 2;
 
@@ -104,6 +127,17 @@ export function TransitionScreen() {
               </div>
             </div>
           </div>
+
+                {transition.add.map((x) => (
+        <div key={`add-${x.denom}`} className="flex items-center gap-2">
+          <Plus size={16} /> Add {x.count} × {x.denom} (each side)
+        </div>
+      ))}
+      {transition.remove.map((x) => (
+        <div key={`rm-${x.denom}`} className="flex items-center gap-2 text-zinc-300">
+          Remove {x.count} × {x.denom} (each side)
+        </div>
+      ))}
 
           <div className="space-y-4">
             <h2 className="text-sm uppercase tracking-wider text-zinc-400">Visual Guide</h2>
