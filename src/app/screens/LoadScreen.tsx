@@ -101,45 +101,59 @@ export function LoadScreen() {
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
       <div className="max-w-[430px] mx-auto min-h-screen bg-zinc-900 flex flex-col">
-        <header className="flex items-center justify-between px-5 py-4 border-b border-zinc-800">
-          <button 
-            onClick={() => navigate('/')}
-            className="p-2 -ml-2 hover:bg-zinc-800 rounded-lg transition-colors"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-                <div className="px-5 pt-4">
+        <header className="px-5 py-4 border-b border-zinc-800">
+  {/* Row 1: Back + Title + Menu */}
+  <div className="flex items-center justify-between">
+    <button
+      onClick={() => navigate("/")}
+      className="p-2 -ml-2 hover:bg-zinc-800 rounded-lg transition-colors"
+      aria-label="Back"
+    >
+      <ChevronLeft className="w-6 h-6" />
+    </button>
+
+    <h1 className="text-lg font-semibold">Squat</h1>
+
+    <button
+      className="p-2 -mr-2 hover:bg-zinc-800 rounded-lg transition-colors"
+      aria-label="Menu"
+    >
+      <Menu className="w-6 h-6" />
+    </button>
+  </div>
+
+  {/* Row 2: Target controls + Transition */}
+  <div className="mt-4 flex items-center gap-3">
+    <div className="flex items-end gap-2 flex-1 min-w-0">
+      <div className="min-w-[52px]">
         <div className="text-xs text-zinc-400 mb-1">Target</div>
         <div className="flex items-center gap-2">
           <input
-            className="w-28 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white"
+            className="w-24 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white"
             value={targetWeight}
             onChange={(e) => setTargetWeight(Number(e.target.value || 0))}
             inputMode="numeric"
           />
-          <span className="text-zinc-400">lb</span>
-          <button
-            className="ml-auto text-sm px-3 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700"
-            onClick={() => setTargetWeight((w) => w + 10)}
-          >
-            +10
-          </button>
+          <span className="text-zinc-400 shrink-0">lb</span>
         </div>
       </div>
 
       <button
-  onClick={handleGoToTransition}
-  className="mx-5 mb-5 mt-4 bg-white text-zinc-900 font-medium py-3 rounded-xl flex items-center justify-center gap-2"
->
-  Transition <ArrowRight size={18} />
-</button>
-          <div className="flex-1 text-center">
-            <h1 className="text-lg font-semibold">Squat</h1>
-          </div>
-          <button className="p-2 -mr-2 hover:bg-zinc-800 rounded-lg transition-colors">
-            <Menu className="w-6 h-6" />
-          </button>
-        </header>
+        className="text-sm px-3 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 shrink-0"
+        onClick={() => setTargetWeight((w) => w + 10)}
+      >
+        +10
+      </button>
+    </div>
+
+    <button
+      onClick={handleGoToTransition}
+      className="bg-white text-zinc-900 font-medium py-3 px-5 rounded-xl flex items-center justify-center gap-2 shrink-0"
+    >
+      Transition <ArrowRight size={18} />
+    </button>
+  </div>
+</header>
 
         <main className="flex-1 overflow-y-auto px-5 py-6 space-y-6">
           <div className="bg-zinc-800/50 rounded-2xl p-6 border border-zinc-700">
