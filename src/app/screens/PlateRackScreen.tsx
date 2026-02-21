@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import * as React from "react";
 import { useNavigate } from 'react-router-dom';
 import { PlateGrid, PlateInfo } from '../components/PlateGrid';
 import { CompactBarbell } from '../components/CompactBarbell';
@@ -28,13 +28,13 @@ interface LoadedPlate {
   width: number;
 }
 const state = getRackState();
-const [targetWeight, setTargetWeight] = useState<number>(state.targetTotal ?? 225);
+const [targetWeight, setTargetWeight] = React.useState<number>(state.targetTotal ?? 225);
 
 export function PlateRackScreen() {
   const navigate = useNavigate();
   const barWeight = 45;
   
-  const [plateInventory, setPlateInventory] = useState<PlateInfo[]>([
+  const [plateInventory, setPlateInventory] = React.useState<PlateInfo[]>([
     { weight: 45, color: PLATE_COLORS[45], count: 4, pairsLoaded: 1 },
     { weight: 25, color: PLATE_COLORS[25], count: 4, pairsLoaded: 1 },
     { weight: 10, color: PLATE_COLORS[10], count: 4, pairsLoaded: 0 },
