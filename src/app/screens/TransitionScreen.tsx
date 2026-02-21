@@ -4,6 +4,7 @@ import { TransitionBarbell } from '../components/TransitionBarbell';
 import { ChevronLeft, Menu, ArrowRight, Plus, Check } from 'lucide-react';
 import { getRackState, setRackState } from "../utils/rackState";
 import { diffPerSide, calculatePerSide } from "../utils/plateMath";
+import { StepDrawer } from "../components/StepDrawer";
 
 const PLATE_COLORS = {
   45: '#E74C3C',
@@ -37,7 +38,7 @@ const currentWeight = state.currentTotal;
 const targetWeight = state.targetTotal;
 const [setNumber, setSetNumber] = useState<number>(state.setNumber ?? 1);
 const [setTotal, setSetTotal] = useState<number>(state.setTotal ?? 4);
-
+const [navOpen, setNavOpen] = useState(false);
 const currentPerSide = state.currentPerSide ?? [];
 const targetCalc = calculatePerSide({
   barWeight,
@@ -135,9 +136,13 @@ const handleApply = () => {
     />
   </div>
 </div>
-          <button className="p-2 -mr-2 hover:bg-zinc-800 rounded-lg transition-colors">
-            <Menu className="w-6 h-6" />
-          </button>
+            <button
+    className="p-2 -mr-2 hover:bg-zinc-800 rounded-lg transition-colors"
+    aria-label="Menu"
+    onClick={() => setNavOpen(true)}
+  >
+    <Menu className="w-6 h-6" />
+  </button>
         </header>
 
         <main className="flex-1 overflow-y-auto px-5 py-6 space-y-6">
@@ -241,6 +246,7 @@ const handleApply = () => {
             Skip to Next Set
           </button>
         </div>
+        <StepDrawer open={navOpen} onClose={() => setNavOpen(false)} />
       </div>
     </div>
   );

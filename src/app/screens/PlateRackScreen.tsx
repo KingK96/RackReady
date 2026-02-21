@@ -1,10 +1,12 @@
 import * as React from "react";
+import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { PlateGrid, PlateInfo } from '../components/PlateGrid';
 import { CompactBarbell } from '../components/CompactBarbell';
 import { ChevronLeft, Menu, Sparkles, Target } from 'lucide-react';
 import { getRackState, setRackState } from "../utils/rackState";
 import { calculatePerSide } from "../utils/plateMath";
+import { StepDrawer } from "../components/StepDrawer";
 
 const PLATE_COLORS = {
   45: '#E74C3C',
@@ -34,6 +36,7 @@ export function PlateRackScreen() {
   const barWeight = 45;
   const state = getRackState();
   const [targetWeight, setTargetWeight] = React.useState<number>(state.targetTotal ?? 225);
+  const [navOpen, setNavOpen] = useState(false);
   
   const [plateInventory, setPlateInventory] = React.useState<PlateInfo[]>([
     { weight: 45, color: PLATE_COLORS[45], count: 4, pairsLoaded: 1 },
@@ -107,9 +110,13 @@ export function PlateRackScreen() {
             <h1 className="text-lg font-semibold">Plate Rack</h1>
             <p className="text-xs text-zinc-400">Build your load</p>
           </div>
-          <button className="p-2 -mr-2 hover:bg-zinc-800 rounded-lg transition-colors">
-            <Menu className="w-6 h-6" />
-          </button>
+                  <button
+          className="p-2 -mr-2 hover:bg-zinc-800 rounded-lg transition-colors"
+          aria-label="Menu"
+          onClick={() => setNavOpen(true)}
+        >
+          <Menu className="w-6 h-6" />
+        </button>
         </header>
 
         <div className="bg-gradient-to-b from-zinc-800 to-zinc-900 border-b border-zinc-800 px-5 py-6">
@@ -153,6 +160,7 @@ export function PlateRackScreen() {
             Suggest Load
           </button>
         </div>
+        <StepDrawer open={navOpen} onClose={() => setNavOpen(false)} />
       </div>
     </div>
   );

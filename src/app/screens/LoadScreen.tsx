@@ -5,6 +5,7 @@ import { PlateRack, PlateType } from '../components/PlateRack';
 import { ChevronLeft, Menu, ArrowRight } from 'lucide-react';
 import { getRackState, setRackState } from "../utils/rackState";
 import { calculatePerSide } from "../utils/plateMath";
+import { StepDrawer } from "../components/StepDrawer";
 
 const PLATE_COLORS = {
   45: '#E74C3C',
@@ -40,6 +41,8 @@ export function LoadScreen() {
 type Workout = (typeof WORKOUTS)[number];
 
 const [workout, setWorkout] = useState<Workout>("Squat");
+
+const [navOpen, setNavOpen] = useState(false);
 
 
 
@@ -135,11 +138,12 @@ const [workout, setWorkout] = useState<Workout>("Squat");
 </div>
 
     <button
-      className="p-2 -mr-2 hover:bg-zinc-800 rounded-lg transition-colors"
-      aria-label="Menu"
-    >
-      <Menu className="w-6 h-6" />
-    </button>
+  className="p-2 -mr-2 hover:bg-zinc-800 rounded-lg transition-colors"
+  aria-label="Menu"
+  onClick={() => setNavOpen(true)}
+>
+  <Menu className="w-6 h-6" />
+</button>
   </div>
 
   {/* Row 2: Target controls + Transition */}
@@ -235,6 +239,7 @@ const [workout, setWorkout] = useState<Workout>("Squat");
             </p>
           )}
         </div>
+        <StepDrawer open={navOpen} onClose={() => setNavOpen(false)} />
       </div>
     </div>
   );
