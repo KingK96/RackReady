@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { BarbellDisplay } from '../components/BarbellDisplay';
 import { PlateRack, PlateType } from '../components/PlateRack';
 import { ChevronLeft, Menu, ArrowRight } from 'lucide-react';
